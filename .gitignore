@@ -1,5 +1,7 @@
 .idea/*
 *.iml
+*.iws
+*.ipr
 target/*
 core/target/*
 math/target/*
@@ -8,3 +10,4 @@ buildtools/target/*
 utils/target/*
 eclipse/target/*
 taste-web/target/*
+
