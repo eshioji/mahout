@@ -4,6 +4,10 @@
 *.ipr
 target/*
 core/target/*
+core/build/*
+core/input/*
+core/output/*
+core/testdata/*
 math/target/*
 examples/target/*
 buildtools/target/*
