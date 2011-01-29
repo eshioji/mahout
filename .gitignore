@@ -14,4 +14,4 @@ buildtools/target/*
 utils/target/*
 eclipse/target/*
 taste-web/target/*
-
+out/*
