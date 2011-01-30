@@ -26,7 +26,7 @@ if [ "$1" = "-ni" ]; then
   clustertype=kmeans
 else
   algorithm=( kmeans lda )
- 
+
   echo "Please select a number to choose the corresponding clustering algorithm"
   echo "1. ${algorithm[0]} clustering"
   echo "2. ${algorithm[1]} clustering"
