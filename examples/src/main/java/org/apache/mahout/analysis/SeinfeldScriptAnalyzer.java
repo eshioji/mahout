@@ -1,9 +1,6 @@
 package org.apache.mahout.analysis;
 
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.LengthFilter;
-import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
 
@@ -13,7 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Analyzes Seinfeld scripts by removing character names, and mute subtitles.
+ * Analyzes Seinfeld scripts by removing numbers, names of characters that are speaking, and mute subtitles and some
+ * stop words.
  *
  * @author Frank Scholten
  */

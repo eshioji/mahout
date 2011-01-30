@@ -16,24 +16,20 @@ INPUT=src/main/resources/seinfeld-scripts
 OUTPUT=out/seinfeld-scripts
 
 mahout clusterdump -s $OUTPUT/clusters/clusters-1/ \
-                   -p $OUTPUT/clusters-1/points \
+                   -p $OUTPUT/clusters/clusteredPoints \
                    -n 5 \
                    -dt sequencefile \
-                   -d $OUTPUT/vectors/dictionary.file-0 \
-                   -b 8 | grep -vi hadoop > $OUTPUT/dump
+                   -d $OUTPUT/vectors/dictionary.file-0 | grep -vi hadoop > $OUTPUT/dump
 
 wait
 
 mahout clusterdump -s $OUTPUT/clusters/clusters-2/ \
-                   -p $OUTPUT/clusters-1/points \
+                   -p $OUTPUT/clusters/clusteredPoints \
                    -n 5 \
                    -dt sequencefile \
-                   -d $OUTPUT/vectors/dictionary.file-0 \
-                   -b 8 | grep -vi hadoop >> $OUTPUT/dump
+                   -d $OUTPUT/vectors/dictionary.file-0 | grep -vi hadoop >> $OUTPUT/dump
 
 wait
-
-# TODO: Print the cluster id and episode titles along with the top terms using an OR regexp
 
 cat $OUTPUT/dump | grep -A5 'Top Terms' | grep -v '\-\-' > $OUTPUT/topterms.txt
 
