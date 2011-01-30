@@ -19,7 +19,8 @@ mahout clusterdump -s $OUTPUT/clusters/clusters-1/ \
                    -p $OUTPUT/clusters-1/points \
                    -n 5 \
                    -dt sequencefile \
-                   -d $OUTPUT/vectors/dictionary.file-0 | grep -vi hadoop > $OUTPUT/dump
+                   -d $OUTPUT/vectors/dictionary.file-0 \
+                   -b 8 | grep -vi hadoop > $OUTPUT/dump
 
 wait
 
@@ -27,7 +28,8 @@ mahout clusterdump -s $OUTPUT/clusters/clusters-2/ \
                    -p $OUTPUT/clusters-1/points \
                    -n 5 \
                    -dt sequencefile \
-                   -d $OUTPUT/vectors/dictionary.file-0 | grep -vi hadoop >> $OUTPUT/dump
+                   -d $OUTPUT/vectors/dictionary.file-0 \
+                   -b 8 | grep -vi hadoop >> $OUTPUT/dump
 
 wait
 
@@ -45,12 +47,12 @@ cat $OUTPUT/dump | cut -d ' ' -f 1 | grep '^CL' | sed s/\{/\\t/ | sed s/CL-// | 
 #        --field         content                                     \
 #        --output        $OUTPUT/cluster-labels.txt                  \
 
-mahout org.apache.mahout.vectorizer.collocations.llr.CollocDriver       \
-    --input $OUTPUT/seqfiles                                            \
-    --output $OUTPUT/collocations                                       \
-    --maxNGramSize 2                                                    \
-    --minLLR 1000                                                       \
-    --analyzerName org.apache.mahout.analysis.SeinfeldScriptAnalyzer    \
-    --preprocess                                                        \
-    --maxRed 1                                                          \
-    --overwrite
+#mahout org.apache.mahout.vectorizer.collocations.llr.CollocDriver       \
+#    --input $OUTPUT/seqfiles                                            \
+#    --output $OUTPUT/collocations                                       \
+#    --maxNGramSize 2                                                    \
+#    --minLLR 1000                                                       \
+#    --analyzerName org.apache.mahout.analysis.SeinfeldScriptAnalyzer    \
+#    --preprocess                                                        \
+#    --maxRed 1                                                          \
+#    --overwrite
