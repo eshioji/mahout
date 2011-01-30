@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -64,17 +64,19 @@ if [ "x$clustertype" == "xkmeans" ]; then
   ./bin/mahout seq2sparse \
     -i ./examples/bin/work/reuters-out-seqdir/ \
     -o ./examples/bin/work/reuters-out-seqdir-sparse \
+    -nv \
   && \
   ./bin/mahout kmeans \
     -i ./examples/bin/work/reuters-out-seqdir-sparse/tfidf-vectors/ \
     -c ./examples/bin/work/clusters \
     -o ./examples/bin/work/reuters-kmeans \
     -x 10 -k 20 -ow \
+    -cl \
   && \
   ./bin/mahout clusterdump \
     -s examples/bin/work/reuters-kmeans/clusters-10 \
     -d examples/bin/work/reuters-out-seqdir-sparse/dictionary.file-0 \
-    -dt sequencefile -b 100 -n 20
+    -dt sequencefile -b 8 -n 20
 elif [ "x$clustertype" == "xlda" ]; then
   ./bin/mahout seq2sparse \
     -i ./examples/bin/work/reuters-out-seqdir/ \

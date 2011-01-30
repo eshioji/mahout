@@ -31,14 +31,18 @@ import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.net.URL;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -89,7 +93,7 @@ public final class TrainLogistic {
           }
           double p = lr.classifyScalar(input);
           if (scores) {
-            output.printf("%10d %2d %10.2f %2.4f %10.4f %10.4f\n",
+            output.printf(Locale.ENGLISH, "%10d %2d %10.2f %2.4f %10.4f %10.4f\n",
               samples, targetValue, lr.currentLearningRate(), p, logP, logPEstimate);
           }
 
@@ -101,20 +105,20 @@ public final class TrainLogistic {
         in.close();
       }
 
-      OutputStreamWriter modelOutput = new FileWriter(outputFile);
+      Writer modelOutput = new OutputStreamWriter(new FileOutputStream(outputFile), Charset.forName("UTF-8"));
       try {
         lmp.saveTo(modelOutput);
       } finally {
         modelOutput.close();
       }
       
-      output.printf("%d\n", lmp.getNumFeatures());
-      output.printf("%s ~ ", lmp.getTargetVariable());
+      output.printf(Locale.ENGLISH, "%d\n", lmp.getNumFeatures());
+      output.printf(Locale.ENGLISH, "%s ~ ", lmp.getTargetVariable());
       String sep = "";
       for (String v : csv.getPredictors()) {
         double weight = predictorWeight(lr, 0, csv, v);
         if (weight != 0) {
-          output.printf("%s%.3f*%s", sep, weight, v);
+          output.printf(Locale.ENGLISH, "%s%.3f*%s", sep, weight, v);
           sep = " + ";
         }
       }
@@ -124,11 +128,11 @@ public final class TrainLogistic {
         for (String key : csv.getTraceDictionary().keySet()) {
           double weight = predictorWeight(lr, row, csv, key);
           if (weight != 0) {
-            output.printf("%20s %.5f\n", key, weight);
+            output.printf(Locale.ENGLISH, "%20s %.5f\n", key, weight);
           }
         }
         for (int column = 0; column < lr.getBeta().numCols(); column++) {
-          output.printf("%15.9f ", lr.getBeta().get(row, column));
+          output.printf(Locale.ENGLISH, "%15.9f ", lr.getBeta().get(row, column));
         }
         output.println();
       }
@@ -299,13 +303,12 @@ public final class TrainLogistic {
   }
 
   static BufferedReader open(String inputFile) throws IOException {
-    InputStreamReader s;
+    InputStream in;
     try {
-      URL resource = Resources.getResource(inputFile);
-      s = new InputStreamReader(resource.openStream());
+      in= Resources.getResource(inputFile).openStream();
     } catch (IllegalArgumentException e) {
-      s = new FileReader(inputFile);
+      in = new FileInputStream(new File(inputFile));
     }
-    return new BufferedReader(s);
+    return new BufferedReader(new InputStreamReader(in, Charset.forName("UTF-8")));
   }
 }
