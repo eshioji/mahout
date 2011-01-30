@@ -1,12 +1,15 @@
 package org.apache.mahout.hbase;
 
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.io.BatchUpdate;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.lib.NullOutputFormat;
+import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -45,13 +48,19 @@ public class HBaseSeinfeldEpisodeImporter extends Configured implements Tool {
     }
   }
 
-
   @Override
-  public int run(String[] strings) throws Exception {
+  public int run(String[] args) throws Exception {
+    if (args.length  != 1) {
+      System.out.println("Usage: " + this.getClass().getSimpleName() + " <clusteredPointsFile>");
+    }
+
     JobConf jc = new JobConf(getConf(), getClass());
     jc.setMapperClass(HBaseSeinfeldEpisodeMapper.class);
     jc.setNumReduceTasks(0);
     jc.setOutputFormat(NullOutputFormat.class);
+
+    FileInputFormat.addInputPath(jc, new Path(args[0]));
+
     JobClient.runJob(jc);
     return 0;
   }
