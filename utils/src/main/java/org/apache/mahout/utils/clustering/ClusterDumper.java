@@ -17,22 +17,6 @@
 
 package org.apache.mahout.utils.clustering;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -42,15 +26,19 @@ import org.apache.hadoop.fs.PathFilter;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
-import org.apache.mahout.clustering.AbstractCluster;
 import org.apache.mahout.clustering.Cluster;
 import org.apache.mahout.clustering.WeightedVectorWritable;
 import org.apache.mahout.common.AbstractJob;
 import org.apache.mahout.common.Pair;
+import org.apache.mahout.math.NamedVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.utils.vectors.VectorHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
 
 public final class ClusterDumper extends AbstractJob {
 
@@ -111,10 +99,10 @@ public final class ClusterDumper extends AbstractJob {
     addOption(SUBSTRING_OPTION, "b", "The number of chars of the asFormatString() to print");
     addOption(NUM_WORDS_OPTION, "n", "The number of top terms to print");
     addOption(JSON_OPTION, "j",
-        "Output the centroid as JSON.  Otherwise it substitues in the terms for vector cell entries");
+            "Output the centroid as JSON.  Otherwise it substitues in the terms for vector cell entries");
     addOption(POINTS_DIR_OPTION, "p",
-        "The directory containing points sequence files mapping input vectors to their cluster.  "
-            + "If specified, then the program will output the points associated with a cluster");
+            "The directory containing points sequence files mapping input vectors to their cluster.  "
+                    + "If specified, then the program will output the points associated with a cluster");
     addOption(DICTIONARY_OPTION, "d", "The dictionary file");
     addOption(DICTIONARY_TYPE_OPTION, "dt", "The dictionary file type (text|sequencefile)", "text");
     if (parseArguments(args) == null) {
@@ -161,7 +149,7 @@ public final class ClusterDumper extends AbstractJob {
 
     Writer writer;
     if (this.outputFile == null) {
-      writer = new OutputStreamWriter(System.out);
+      writer = new OutputStreamWriter(System.out, Charset.forName("UTF-8"));
     } else {
       writer = new OutputStreamWriter(new FileOutputStream(new File(this.outputFile)), Charset.forName("UTF-8"));
     }
@@ -176,34 +164,39 @@ public final class ClusterDumper extends AbstractJob {
           Writable value = reader.getValueClass().asSubclass(Writable.class).newInstance();
           while (reader.next(key, value)) {
             Cluster cluster = (Cluster) value;
-            String fmtStr = useJSON ? cluster.asJsonString() : cluster.asFormatString(dictionary);
-            if (subString > 0 && fmtStr.length() > subString) {
-              writer.write(':');
-              writer.write(fmtStr, 0, Math.min(subString, fmtStr.length()));
-            } else {
-              writer.write(fmtStr);
-            }
+//            String fmtStr = useJSON ? cluster.asJsonString() : cluster.asFormatString(dictionary);
+//            if (subString > 0 && fmtStr.length() > subString) {
+//              writer.write(':');
+//              writer.write(fmtStr, 0, Math.min(subString, fmtStr.length()));
+//            } else {
+//              writer.write(fmtStr);
+//            }
 
-            writer.write('\n');
+            writer.write("C-");
+            writer.write(String.valueOf(cluster.getId()));
+            writer.write(" ");
 
             if (dictionary != null) {
               String topTerms = getTopFeatures(cluster.getCenter(), dictionary, numTopFeatures);
-              writer.write("\tTop Terms: ");
+//              writer.write("\tTop Terms: ");
               writer.write(topTerms);
               writer.write('\n');
             }
 
             List<WeightedVectorWritable> points = clusterIdToPoints.get(cluster.getId());
             if (points != null) {
-              writer.write("\tWeight:  Point:\n\t");
-              for (Iterator<WeightedVectorWritable> iterator = points.iterator(); iterator.hasNext();) {
-                WeightedVectorWritable point = iterator.next();
-                writer.write(String.valueOf(point.getWeight()));
-                writer.write(": ");
-                writer.write(AbstractCluster.formatVector(point.getVector(), dictionary));
-                if (iterator.hasNext()) {
-                  writer.write("\n\t");
-                }
+//              writer.write("\tWeight:  Point:\n\t");
+              for (WeightedVectorWritable point : points) {
+                NamedVector namedVector = (NamedVector) point.getVector();
+                writer.write("- ");
+                writer.write(namedVector.getName());
+                writer.write("\n");
+//                writer.write(String.valueOf(point.getWeight()));
+//                writer.write(": ");
+//                writer.write(AbstractCluster.formatVector(point.getVector(), dictionary));
+//                if (iterator.hasNext()) {
+//                  writer.write("\n\t");
+//                }
               }
               writer.write('\n');
             }
@@ -348,14 +341,21 @@ public final class ClusterDumper extends AbstractJob {
     }
 
     StringBuilder sb = new StringBuilder(100);
+    sb.append("[");
 
-    for (Pair<String, Double> item : topTerms) {
+    Iterator<Pair<String, Double>> iterator = topTerms.iterator();
+    while (iterator.hasNext()) {
+      Pair<String, Double> item = iterator.next();
       String term = item.getFirst();
-      sb.append("\n\t\t");
-      sb.append(StringUtils.rightPad(term, 40));
-      sb.append("=>");
-      sb.append(StringUtils.leftPad(item.getSecond().toString(), 20));
+      sb.append(StringUtils.capitalize(term));
+      if (iterator.hasNext()) {
+        sb.append(", ");
+      }
+//      sb.append(StringUtils.rightPad(term, 40));
+//      sb.append("=>");
+//
     }
+    sb.append("]");
     return sb.toString();
   }
 
