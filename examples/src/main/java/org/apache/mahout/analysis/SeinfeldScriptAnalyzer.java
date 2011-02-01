@@ -20,7 +20,7 @@ import java.util.Set;
 public class SeinfeldScriptAnalyzer extends Analyzer {
 
   final List<String> stopWords = Arrays.asList(
-          "a", "an", "and", "are", "as", "at", "be", "but", "by",
+          "a", "an", "and", "are", "as", "at", "be", "but", "by", "alright", "around", "here", "come", "back",
           "do", "don't", "for", "he", "here", "i", "if", "in", "i'm", "into", "is", "it", "know", "me",
           "no", "not", "oh", "of", "on", "or", "such",
           "get", "gonna", "good", "going", "just", "from", "about",
