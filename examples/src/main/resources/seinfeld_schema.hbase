@@ -1,0 +1,3 @@
+create 'clusters', 'cf';
+
+create 'episodes', 'cf';
