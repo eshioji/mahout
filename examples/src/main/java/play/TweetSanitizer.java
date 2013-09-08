@@ -52,7 +52,7 @@ public class TweetSanitizer  {
         sanitized = LINEBREAKS.matcher(sanitized).replaceAll(" ");
 
         // Trim whitespace
-        CharMatcher.WHITESPACE.trimAndCollapseFrom(sanitized,' ');
+        sanitized = CharMatcher.WHITESPACE.trimAndCollapseFrom(sanitized,' ');
 
 
         // Remove non ascii chars
